@@ -1,0 +1,55 @@
+HOSTS:
+  debian-8-x64-jasmin:
+    roles:
+      - agent
+      - default
+      - babag
+      - babag-sender
+      - babag-api
+      - babag-smtp
+    platform: ubuntu-xenial-amd64
+    hypervisor: docker
+    docker_preserve_image: true
+    image: solita/ubuntu-systemd:16.04
+    docker_image_commands:
+    - 'apt-get update'
+    - 'apt-get install -y wget'
+    - 'apt-get install openssh-server'
+    - 'apt-get install net-tools'
+    - 'systemctl enable ssh.service'
+    docker_cmd: '["/sbin/init"]'
+    mount_folders:
+      cgroup:
+        host_path: /sys/fs/cgroup
+        container_path: /sys/fs/cgroup
+        opts: rw
+  rabbitmq:
+    roles:
+      - rabbitmq
+    platform: debian-8-amd64
+    hypervisor: docker
+    docker_preserve_image: true
+    docker_image_commands:
+    - 'apt-get install -y wget'
+    - 'apt-get install -y openssh-server'
+    docker_image_entrypoint: '[]'
+    docker_cmd: 'service ssh start; /docker-entrypoint.sh rabbitmq-server'
+    image: rabbitmq:3
+  postgres:
+    roles:
+      - postgres
+    platform: debian-8-amd64
+    hypervisor: docker
+    docker_preserve_image: true
+    docker_image_commands:
+    - 'apt-get update'
+    - 'apt-get install -y wget'
+    - 'apt-get install -y openssh-server'
+    - 'apt-get install -y postgresql'
+    - 'echo "host all all 0.0.0.0/0 trust" >> /etc/postgresql/9.5/main/pg_hba.conf'
+    - 'echo "listen_addresses = ''*''" >> /etc/postgresql/9.5/main/postgresql.conf'
+    docker_image_entrypoint: '[]'
+    docker_cmd: 'service ssh start; service postgresql start; tail -f /dev/null'
+    image: ubuntu:16.04
+CONFIG:
+type: foss

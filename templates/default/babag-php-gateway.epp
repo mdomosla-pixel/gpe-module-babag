@@ -1,0 +1,25 @@
+<?php
+
+$user = $_GET["user"];
+$pass = $_GET["pass"];
+
+$url = 'http://127.0.0.1:<%= $api_port %>/api/v1/sms';
+$to = "+" . $_GET['to'];
+$provider = 'smsapi-com';
+$from = 'CircleK';
+
+$getParams = array(
+  "from" => $from,
+  "to" => $to,
+  "content" => $_GET['content'],
+  "provider" => $provider
+);
+$json = json_encode($getParams);
+
+$ch = curl_init( $url );
+curl_setopt( $ch, CURLOPT_POSTFIELDS, $json);
+curl_setopt( $ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+$result = curl_exec($ch);
+curl_close($ch);
+echo "$result";

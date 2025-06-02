@@ -1,0 +1,126 @@
+class babag::smtp (
+  $ensure            = 'latest',
+  $manage_repo       = true,
+
+  $log_level         = 'info',
+
+  $aws_region,
+  $dynamodb_status_table,
+
+  $smtp_port,
+
+  $admin_enabled,
+  $admin_bind_address,
+  $admin_port,
+
+  $postgres_username,
+  $postgres_password,
+  $postgres_database,
+  $postgres_host,
+
+  $rabbitmq_host,
+  $rabbitmq_port,
+  $rabbitmq_vhost,
+  $rabbitmq_user,
+  $rabbitmq_pass,
+
+  $rabbitmq_ssl      = false,
+  $rabbitmq_ssl_cert = undef,
+  $rabbitmq_ssl_key  = undef,
+  $rabbitmq_ssl_ca   = undef,
+
+  $sms_user,
+  $sms_from,
+  $sms_provider,
+
+  $nrepl_enabled,
+  $nrepl_port,
+  $nrepl_bind_address,
+
+  $metrics_enabled   = false,
+  $metrics_host      = "localhost",
+  $metrics_port      = 8125,
+
+  $certificates,
+) {
+
+  $component_name = 'babag-smtp'
+
+  ensure_packages(["${component_name}-service"],
+    {
+      ensure  => $ensure,
+      require => [
+        Apt::Source['sfrbintray'],
+        Class['apt::update'],
+        Package['apt-transport-https'],
+      ],
+      notify  => Service[$component_name],
+    })
+
+  ensure_resource('file', "/etc/default/${component_name}",
+    {
+      "content" => epp("${module_name}/default/${component_name}.epp",
+        {
+          log_level             => $log_level,
+
+          aws_region            => $aws_region,
+          dynamodb_status_table => $dynamodb_status_table,
+
+          smtp_port             => $smtp_port,
+
+          admin_enabled         => $admin_enabled,
+          admin_bind_address    => $admin_bind_address,
+          admin_port            => $admin_port,
+
+          postgres_username     => $postgres_username,
+          postgres_password     => $postgres_password,
+          postgres_database     => $postgres_database,
+          postgres_host         => $postgres_host,
+
+          rabbitmq_host         => $rabbitmq_host,
+          rabbitmq_port         => $rabbitmq_port,
+          rabbitmq_vhost        => $rabbitmq_vhost,
+
+          rabbitmq_username     => $rabbitmq_user,
+          rabbitmq_password     => $rabbitmq_pass,
+
+          rabbitmq_ssl          => $rabbitmq_ssl,
+          rabbitmq_ssl_cert     => $rabbitmq_ssl_cert,
+          rabbitmq_ssl_key      => $rabbitmq_ssl_key,
+          rabbitmq_ssl_ca       => $rabbitmq_ssl_ca,
+
+          sms_user             => $sms_user,
+          sms_from             => $sms_from,
+          sms_provider         => $sms_provider,
+
+          nrepl_enabled         => $nrepl_enabled,
+          nrepl_port            => $nrepl_port,
+          nrepl_bind_address    => $nrepl_bind_address,
+
+          metrics_enabled       => $metrics_enabled,
+          metrics_host          => $metrics_host,
+          metrics_port          => $metrics_port,
+        }
+      ),
+      "mode"    => "0600",
+      notify    => Service[$component_name],
+    })
+
+  service { $component_name:
+    provider => systemd,
+    ensure   => running,
+    enable   => true,
+    require  => Package["${component_name}-service"],
+  }
+
+  $certificates.each |$key, $value| {
+    file {
+      "/etc/postfix/${key}.pem":
+        ensure  => file,
+        content => "${value}",
+        require => Package['postfix'],
+        notify  => Service['postfix'],
+        tag => ['postfix'],
+    }
+  }
+}

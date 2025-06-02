@@ -1,0 +1,57 @@
+LOG_LEVEL="<%= $log_level %>"
+
+# AWS
+AWS__REGION="<%= $aws_region %>"
+AWS__STATUSES_TABLE="<%= $dynamodb_status_table %>"
+
+# Link Mobility
+LINKMOBILITY__URL="<%= $linkmobility_url %>"
+LINKMOBILITY__PLATFORM_ID="<%= $linkmobility_platform_id %>"
+LINKMOBILITY__PLATFORM_PARTNER_ID="<%= $linkmobility_platform_partner_id %>"
+LINKMOBILITY__USERNAME="<%= $linkmobility_username %>"
+LINKMOBILITY__PASSWORD="<%= $linkmobility_password %>"
+
+SMSAPI_COM__TOKEN="<%= $smsapi_com_token %>"
+
+# RabbitMQ
+RABBITMQ__HOST="<%= $rabbitmq_host %>"
+RABBITMQ__PORT="<%= $rabbitmq_port %>"
+RABBITMQ__VHOST="<%= $rabbitmq_vhost %>"
+RABBITMQ__USERNAME="<%= $rabbitmq_username %>"
+RABBITMQ__PASSWORD="<%= $rabbitmq_password %>"
+
+# Postgres
+POSTGRES__USERNAME="<%= $postgres_username %>"
+POSTGRES__PASSWORD="<%= $postgres_password %>"
+POSTGRES__DATABASE="<%= $postgres_database %>"
+POSTGRES__HOST="<%= $postgres_host %>"
+
+RABBITMQ__SSL="<%= $rabbitmq_ssl -%>"
+<% if $rabbitmq_ssl_ca { -%>
+RABBITMQ__CACERT="<%= $rabbitmq_ssl_ca %>"
+<% } -%>
+<% if $rabbitmq_ssl_cert { -%>
+RABBITMQ__CERT="<%= $rabbitmq_ssl_cert %>"
+<% } -%>
+<% if $rabbitmq_ssl_key { -%>
+RABBITMQ__KEY_PKCS8="<%= $rabbitmq_ssl_key %>"
+<% } -%>
+
+# HTTP Admin API - Jetty
+ADMIN__ENABLED="<%= $admin_enabled %>"
+ADMIN__BIND_ADDRESS="<%= $admin_bind_address %>"
+ADMIN__PORT="<%= $admin_port %>"
+
+# nREPL - programatic dev access
+NREPL__ENABLED="<%= $nrepl_enabled %>"
+NREPL__BIND_ADDRESS="<%= $nrepl_bind_address %>"
+NREPL__PORT="<%= $nrepl_port %>"
+
+# StatsD
+METRICS__ENABLED="<%= $metrics_enabled %>"
+<% if $metrics_enabled { -%>
+METRICS__HOST="<%= $metrics_host %>"
+METRICS__PORT="<%= $metrics_port %>"
+<% } -%>
+
+NOOP_SENDING="<%= $noop_sending %>"
